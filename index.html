@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Pour ma Mamounette ❤️</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#ff9acb,#ff5fa2);
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+}
+
+/* ===== CARTES ===== */
+.card{
+  display:none;
+  background:#ffd6e8;
+  padding:25px;
+  border-radius:22px;
+  width:90%;
+  max-width:360px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+  position:relative;
+  z-index:10;
+}
+
+.card h1,.card p{z-index:20;position:relative}
+
+/* ===== BOUTONS ===== */
+button{
+  padding:12px 22px;
+  border:none;
+  border-radius:25px;
+  font-size:16px;
+  cursor:pointer;
+  margin:10px;
+}
+
+#yes{background:#ff4081;color:white;}
+#no{background:#ccc;position:absolute}
+
+/* ===== ENVELOPPE ===== */
+.envelope{
+  width:200px;
+  cursor:pointer;
+  animation:bounce 1.4s infinite;
+}
+@keyframes bounce{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+}
+
+/* ===== HACK ===== */
+#hack{
+  background:black;
+  color:red;
+  border:4px solid red;
+  animation:blink .15s infinite alternate;
+}
+@keyframes blink{
+  from{transform:scale(1);}
+  to{transform:scale(1.06);}
+}
+
+.hackBox{animation:shake .12s infinite;}
+@keyframes shake{
+  0%{transform:translate(0,0);}
+  25%{transform:translate(4px,-4px);}
+  50%{transform:translate(-4px,4px);}
+  75%{transform:translate(4px,4px);}
+  100%{transform:translate(0,0);}
+}
+
+.hackTop{
+  font-size:26px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.hackFixed{
+  font-size:14px;
+  font-weight:bold;
+}
+
+.alert{
+  position:absolute;
+  color:red;
+  font-size:13px;
+  font-weight:bold;
+  animation:flash .4s infinite;
+}
+@keyframes flash{
+  0%{opacity:1;}
+  50%{opacity:0;}
+  100%{opacity:1;}
+}
+
+.progress{
+  width:100%;
+  height:14px;
+  background:#330000;
+  border-radius:10px;
+  margin-top:15px;
+  overflow:hidden;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:red;
+  transition:width .7s linear;
+}
+
+/* ===== FINAL ===== */
+#final h1{color:#ff4081;font-size:32px}
+#final p{color:#ff4081;font-size:18px}
+
+/* ===== CŒURS ===== */
+.heart{
+  position:absolute;
+  z-index:15;
+  opacity:.45;
+  animation:heartFloat 5s ease-out forwards;
+}
+@keyframes heartFloat{
+  0%{transform:translateY(20px) scale(.5);opacity:0}
+  20%{opacity:.5}
+  80%{opacity:.5}
+  100%{transform:translateY(-60px) scale(1);opacity:0}
+}
+
+/* ===== CONFETTIS ===== */
+.confetti{
+  position:absolute;
+  z-index:1;
+  animation:confettiSpin 6s linear forwards;
+}
+@keyframes confettiSpin{
+  from{transform:rotate(0deg);opacity:1}
+  to{transform:rotate(360deg);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div class="card" id="intro">
+  <h1>Pour ma Mamounette ❤️</h1>
+  <p>Clique sur l’enveloppe</p>
+  <img src="IMG_5431.jpeg" class="envelope" onclick="openLetter()">
+</div>
+
+<!-- QUESTION -->
+<div class="card" id="question">
+  <h1 id="qText"> Penses-tu être une bonne maman ? 💍</h1>
+  <button id="yes" onclick="nextQuestion()">Oui ❤️</button>
+  <button id="no" onmouseover="moveNo()">Non 😔</button>
+</div>
+
+<!-- HACK -->
+<div class="card" id="hack">
+  <div class="hackBox">
+    <div class="hackTop" id="hackTop">TRÈS BIEN</div>
+    <div class="hackFixed">
+      TRÈS BIEN JE VAIS TE HACKER MAINTENANT<br>
+      C’EST TANT PIS POUR TOI ⚠️
+    </div>
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div class="card" id="final">
+  <h1>Je t’aime ❤️</h1>
+  <p> A la meilleure des mamans 💖</p>
+</div>
+
+<script>
+const questions=[
+  "Penses-tu être une bonne maman ? 💍",
+  "T’es sûre ? 🤍",
+  "Réfléchis bien… 🫣"
+];
+
+const hackMsgs=[
+  "TRÈS BIEN",
+  "JE VAIS TE HACKER",
+  "MAINTENANT",
+  "⚠️ HACK EN COURS ⚠️",
+  "SYSTÈME COMPROMIS",
+  "ERREUR SYSTÈME",
+  "SYSTÈME HS"
+];
+
+let qStep=0, hStep=0;
+let hearts=[], confettis=[];
+
+window.onload=()=>intro.style.display="block";
+
+function openLetter(){
+  intro.style.display="none";
+  question.style.display="block";
+}
+
+function nextQuestion(){
+  qStep++;
+  if(qStep<questions.length){
+    qText.innerText=questions[qStep];
+  }else{
+    question.style.display="none";
+    startHack();
+  }
+}
+
+function startHack(){
+  hack.style.display="block";
+  spawnAlerts();
+  const interval=setInterval(()=>{
+    hackTop.innerText=hackMsgs[hStep];
+    bar.style.width=((hStep+1)/hackMsgs.length)*100+"%";
+    hStep++;
+    if(hStep>=hackMsgs.length){
+      clearInterval(interval);
+      setTimeout(showFinal,900);
+    }
+  },900);
+}
+
+function spawnAlerts(){
+  for(let i=0;i<15;i++){
+    const a=document.createElement("div");
+    a.className="alert";
+    a.innerText="⚠️ ALERT ⚠️";
+    a.style.left=Math.random()*100+"%";
+    a.style.top=Math.random()*100+"%";
+    hack.appendChild(a);
+    setTimeout(()=>a.remove(),2000);
+  }
+}
+
+function showFinal(){
+  hack.style.display="none";
+  final.style.display="block";
+  setInterval(spawnHeart,350);
+  setInterval(spawnConfetti,300);
+}
+
+function spawnHeart(){
+  if(hearts.length>=25){hearts.shift().remove();}
+  const h=document.createElement("div");
+  h.className="heart";
+  h.innerHTML="❤️";
+  h.style.left=Math.random()*80+"%";
+  h.style.top=Math.random()*70+"%";
+  h.style.fontSize=18+Math.random()*18+"px";
+  final.appendChild(h);
+  hearts.push(h);
+  setTimeout(()=>{h.remove();hearts=hearts.filter(e=>e!==h)},5000);
+}
+
+function spawnConfetti(){
+  if(confettis.length >= 50){
+    confettis.shift().remove();
+  }
+
+  const c = document.createElement("div");
+  c.className = "confetti";
+  c.innerHTML = "🎉";
+
+  c.style.position = "fixed";   // clé absolue
+  c.style.left = Math.random()*100 + "vw";
+  c.style.top  = Math.random()*100 + "vh";
+  c.style.fontSize = 14 + Math.random()*22 + "px";
+  c.style.zIndex = "2";         // derrière la carte
+
+  document.body.appendChild(c);
+  confettis.push(c);
+
+  setTimeout(()=>{
+    c.remove();
+    confettis = confettis.filter(e=>e!==c);
+  },6000);
+}
+
+
+function moveNo(){
+  no.style.transform=`translate(${Math.random()*140-70}px,${Math.random()*80-40}px)`;
+}
+</script>
+
+</body>
+</html>
